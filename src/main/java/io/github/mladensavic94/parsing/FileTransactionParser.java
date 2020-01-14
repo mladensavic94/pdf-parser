@@ -1,16 +1,13 @@
 package io.github.mladensavic94.parsing;
 
-import com.itextpdf.text.Document;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.*;
-import com.itextpdf.tool.xml.XMLWorkerHelper;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
