@@ -28,19 +28,18 @@ public class FileTransactionParser implements TransactionParser<File> {
     private void textExtractor(File in) {
         try {
             PdfReader reader = new PdfReader(new FileInputStream(in));
-            String firstPageText = pageTextExtractor(reader, new Rectangle(0, 92,612, 455), 1);
-//            System.out.println(firstPageText);
-//            System.out.println(firstPageText.split("\\n").length);
+            String firstPageText = pageTextExtractor(reader, new Rectangle(0, 92, 612, 455), 1);
             String restPagesText = "";
             for (int i = 2; i <= reader.getNumberOfPages(); i++) {
-                restPagesText = pageTextExtractor(reader, new Rectangle(0, 92,612, 740), i);
-//                System.out.println(restPagesText);
-//                System.out.println(restPagesText.split("\\n").length);
+                restPagesText += pageTextExtractor(reader, new Rectangle(0, 92, 612, 738), i);
             }
             List<String> allLines = firstPageText.lines().collect(Collectors.toList());
             allLines.addAll(restPagesText.lines().collect(Collectors.toList()));
+            allLines.forEach(System.out::println);
+            System.out.println("*******" + allLines.size());
             List<String> blocks = transformLinesIntoBlock(allLines);
             blocks.forEach(System.out::println);
+            System.out.println("*******" + blocks.size());
             reader.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -54,19 +53,16 @@ public class FileTransactionParser implements TransactionParser<File> {
         return PdfTextExtractor.getTextFromPage(reader, page, strategy);
     }
 
-    private List<String> transformLinesIntoBlock(List<String> lines){
+    private List<String> transformLinesIntoBlock(List<String> lines) {
         List<String> blocks = new ArrayList<>();
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i);
-            if(isFirstWordDate(line)){
-                for (int j = i+1; j < lines.size(); j++) {
-                    line += lines.get(j);
-                    i = j;
-                    if(!isFirstWordDate(lines.get(j)))
-                        break;
+            if (isFirstWordDate(line)) {
+                for (int j = i + 1; j < lines.size(); j++) {
+
                 }
+                blocks.add(line);
             }
-            blocks.add(line);
         }
         return blocks;
     }
