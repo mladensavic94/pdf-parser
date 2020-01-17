@@ -19,30 +19,25 @@ public class FileTransactionParser implements TransactionParser<File> {
 
     @Override
     public List<Transaction> parse(Supplier<File> input) {
-        File in = input.get();
-        List<Transaction> transactions = new ArrayList<>();
-        textExtractor(in);
-        return transactions;
+        return textExtractor(input.get());
     }
 
-    private void textExtractor(File in) {
+    private List<Transaction> textExtractor(File in) {
         try {
             PdfReader reader = new PdfReader(new FileInputStream(in));
             String firstPageText = pageTextExtractor(reader, new Rectangle(0, 92, 612, 455), 1);
             String restPagesText = "";
             for (int i = 2; i <= reader.getNumberOfPages(); i++) {
-                restPagesText += pageTextExtractor(reader, new Rectangle(0, 92, 612, 738), i);
+                restPagesText += "\n" + pageTextExtractor(reader, new Rectangle(0, 92, 612, 738), i);
             }
             List<String> allLines = firstPageText.lines().collect(Collectors.toList());
             allLines.addAll(restPagesText.lines().collect(Collectors.toList()));
-            allLines.forEach(System.out::println);
-            System.out.println("*******" + allLines.size());
             List<String> blocks = transformLinesIntoBlock(allLines);
-            blocks.forEach(System.out::println);
-            System.out.println("*******" + blocks.size());
             reader.close();
+            return blocks.stream().map(this::lineToTransaction).collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
     }
 
@@ -56,23 +51,32 @@ public class FileTransactionParser implements TransactionParser<File> {
     private List<String> transformLinesIntoBlock(List<String> lines) {
         List<String> blocks = new ArrayList<>();
         for (int i = 0; i < lines.size(); i++) {
-            String line = lines.get(i);
-            if (isFirstWordDate(line)) {
-                for (int j = i + 1; j < lines.size(); j++) {
-
+            String line = lines.get(i) + " ";
+            int j = i + 1;
+            for (; j < lines.size(); j++) {
+                if (!isFirstWordDate(lines.get(j))) {
+                    line += lines.get(j);
+                } else {
+                    i = j - 1;
+                    break;
                 }
-                blocks.add(line);
             }
+            blocks.add(line);
+            if(j == lines.size()) break;
         }
         return blocks;
     }
 
-    private boolean isFirstWordDate(String line){
+    private Transaction lineToTransaction(String line){
+        return null;
+    }
+
+    private boolean isFirstWordDate(String line) {
         String temp = line.split(" ")[0];
-        try{
+        try {
             LocalDate.parse(temp, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             return true;
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
