@@ -3,11 +3,11 @@ package io.github.mladensavic94.parsing;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.*;
-import org.w3c.dom.ls.LSOutput;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
@@ -18,7 +18,9 @@ import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class FileTransactionParser implements TransactionParser<File> {
+public class FileTransactionsParser implements TransactionsParser<File> {
+
+    List<SingleTransactionParser> parsers = List.of(new DefaultSingleTransactionParser(), new PaymentSingleTransactionParser());
 
     @Override
     public List<Transaction> parse(Supplier<File> input) {
@@ -70,7 +72,13 @@ public class FileTransactionParser implements TransactionParser<File> {
         return blocks;
     }
 
-    private Transaction lineToTransaction(String line){
+    private Transaction lineToTransaction(String line) {
+        System.out.println(line);
+        for (SingleTransactionParser parser : parsers) {
+            try {
+                return parser.parse(line);
+            }catch (Exception ignored){}
+        }
         return null;
     }
 
@@ -84,20 +92,20 @@ public class FileTransactionParser implements TransactionParser<File> {
         }
     }
 
-    private LocalDate string2Date(String date){
+    public static LocalDate string2Date(String date){
         return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
-    private int string2CardNumber(String desc){
+    public static int string2CardNumber(String desc){
         try {
             return Integer.parseInt(desc.substring(0,4));
         }catch (Exception e){
             return 0;
         }
     }
-    private double string2Double(String d) throws ParseException {
-        NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
-        Number number = format.parse(d);
+    public static double string2Double(String d) throws ParseException {
+        DecimalFormat decimalFormat = new DecimalFormat("###,###.##");
+        Number number = decimalFormat.parse(d);
         return number.doubleValue();
     }
 }
