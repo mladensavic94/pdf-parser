@@ -8,8 +8,16 @@ import java.io.File;
 public class FileParserTest {
 
     @Test
-    public void testFile(){
+    public void testFile() throws FileNotFoundException {
         FileTransactionParser parser = new FileTransactionParser();
-        parser.parse(() -> new File(".\\izvod.PDF"));
+        List<Transaction> parse = parser.parse(() -> new File(".\\izvod.PDF"));
+        System.out.println(parse);
+//        PrintWriter out = new PrintWriter("out.csv");
+//        for (Transaction transaction : parse) {
+//            out.write(transaction.toString());
+//            out.write("\n");
+//        }
+//        out.flush();
+//        out.close();
     }
 }

@@ -8,10 +8,13 @@ import org.w3c.dom.ls.LSOutput;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -79,5 +82,22 @@ public class FileTransactionParser implements TransactionParser<File> {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private LocalDate string2Date(String date){
+        return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+    }
+
+    private int string2CardNumber(String desc){
+        try {
+            return Integer.parseInt(desc.substring(0,4));
+        }catch (Exception e){
+            return 0;
+        }
+    }
+    private double string2Double(String d) throws ParseException {
+        NumberFormat format = NumberFormat.getInstance(Locale.FRANCE);
+        Number number = format.parse(d);
+        return number.doubleValue();
     }
 }

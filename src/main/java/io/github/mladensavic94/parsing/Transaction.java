@@ -1,10 +1,10 @@
 package io.github.mladensavic94.parsing;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Transaction {
 
-    private Date dateOfTransaction;
+    private LocalDate dateOfTransaction;
     private int cardNumber;
     private String desc;
     private double refValue;
@@ -13,11 +13,11 @@ public class Transaction {
     private double amountDebited;
     private double balance;
 
-    public Date getDateOfTransaction() {
+    public LocalDate getDateOfTransaction() {
         return dateOfTransaction;
     }
 
-    public void setDateOfTransaction(Date dateOfTransaction) {
+    public void setDateOfTransaction(LocalDate dateOfTransaction) {
         this.dateOfTransaction = dateOfTransaction;
     }
 
@@ -75,5 +75,16 @@ public class Transaction {
 
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    @Override
+    public String toString() {
+        return dateOfTransaction +", " +
+                cardNumber +", " +
+                refValue +", " +
+                amountCredited +", " +
+                amountDebited +", " +
+                balance +", " +
+                desc;
     }
 }
