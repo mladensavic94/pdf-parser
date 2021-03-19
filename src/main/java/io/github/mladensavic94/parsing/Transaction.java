@@ -87,4 +87,8 @@ public class Transaction {
                 balance +", " +
                 desc;
     }
+
+    public static String csvHeaders(){
+        return "dateOfTransaction, cardNumber, refValue, amountCredited, amountDebited, balance, desc";
+    }
 }

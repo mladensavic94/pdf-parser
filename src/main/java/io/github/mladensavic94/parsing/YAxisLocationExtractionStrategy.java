@@ -12,8 +12,8 @@ public class YAxisLocationExtractionStrategy implements TextExtractionStrategy {
 
     public static final int Y_AXIS_TOLERANCE_MAGIC_NUMBER = 5;
 
-    private List<TextChunk> textChunks = new ArrayList<>();
-    private TextChunkLocationStrategy tclStrat;
+    private final List<TextChunk> textChunks = new ArrayList<>();
+    private final TextChunkLocationStrategy tclStrat;
 
     public YAxisLocationExtractionStrategy() {
         tclStrat = (renderInfo, baseline) -> new TextChunkLocationDefaultImp(baseline.getStartPoint(), baseline.getEndPoint(), renderInfo.getSingleSpaceWidth());

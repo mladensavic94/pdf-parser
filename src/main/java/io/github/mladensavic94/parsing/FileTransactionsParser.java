@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 public class FileTransactionsParser implements TransactionsParser<File> {
 
-    List<SingleTransactionParser> parsers = List.of(new DefaultSingleTransactionParser(), new PaymentSingleTransactionParser());
+    List<SingleTransactionParser> parsers = List.of(new DefaultSingleTransactionParser(), new RegexTransactionParser());
 
     @Override
     public List<Transaction> parse(Supplier<File> input) {
@@ -31,12 +31,12 @@ public class FileTransactionsParser implements TransactionsParser<File> {
         try {
             PdfReader reader = new PdfReader(new FileInputStream(in));
             String firstPageText = pageTextExtractor(reader, new Rectangle(0, 92, 612, 455), 1);
-            String restPagesText = "";
+            StringBuilder restPagesText = new StringBuilder();
             for (int i = 2; i <= reader.getNumberOfPages(); i++) {
-                restPagesText += "\n" + pageTextExtractor(reader, new Rectangle(0, 92, 612, 738), i);
+                restPagesText.append("\n").append(pageTextExtractor(reader, new Rectangle(0, 92, 612, 738), i));
             }
             List<String> allLines = firstPageText.lines().collect(Collectors.toList());
-            allLines.addAll(restPagesText.lines().collect(Collectors.toList()));
+            allLines.addAll(restPagesText.toString().lines().collect(Collectors.toList()));
             List<String> blocks = transformLinesIntoBlock(allLines);
             reader.close();
             return blocks.stream().map(this::lineToTransaction).collect(Collectors.toList());
@@ -73,7 +73,6 @@ public class FileTransactionsParser implements TransactionsParser<File> {
     }
 
     private Transaction lineToTransaction(String line) {
-        System.out.println(line);
         for (SingleTransactionParser parser : parsers) {
             try {
                 return parser.parse(line);

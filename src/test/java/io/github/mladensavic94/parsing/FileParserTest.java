@@ -1,6 +1,6 @@
 package io.github.mladensavic94.parsing;
 
-import org.junit.Assert;
+import io.github.mladensavic94.exporting.CSVExporter;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +10,6 @@ import java.text.ParseException;
 import java.util.List;
 
 import static io.github.mladensavic94.parsing.FileTransactionsParser.string2Double;
-import static org.junit.Assert.assertEquals;
 
 
 public class FileParserTest {
@@ -18,15 +17,12 @@ public class FileParserTest {
     @Test
     public void testFile() throws FileNotFoundException {
         FileTransactionsParser parser = new FileTransactionsParser();
-        List<Transaction> parse = parser.parse(() -> new File(".\\izvod.PDF"));
-        System.out.println(parse);
-//        PrintWriter out = new PrintWriter("out.csv");
-//        for (Transaction transaction : parse) {
-//            out.write(transaction.toString());
-//            out.write("\n");
-//        }
-//        out.flush();
-//        out.close();
+        List<Transaction> parse = parser.parse(() -> new File("src/test/resources/11-20.PDF"));
+        parse.addAll(parser.parse(() -> new File("src/test/resources/12-20.PDF")));
+        parse.addAll(parser.parse(() -> new File("src/test/resources/01-21.PDF")));
+        parse.addAll(parser.parse(() -> new File("src/test/resources/02-21.PDF")));
+        CSVExporter csvExporter = new CSVExporter("1120-0221.csv");
+        csvExporter.export(parse);
     }
 
     @Test
