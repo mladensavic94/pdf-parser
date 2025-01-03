@@ -8,13 +8,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Objects;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -24,10 +24,15 @@ public class FileTransactionsParser implements TransactionsParser<File> {
 
     @Override
     public List<Transaction> parse(Supplier<File> input) {
-        return textExtractor(input.get());
+        return textExtractor(input.get(), this::lineToTransaction);
     }
 
-    private List<Transaction> textExtractor(File in) {
+    @Override
+    public List<String> scrape(Supplier<File> input) {
+        return textExtractor(input.get(), s -> s);
+    }
+
+    private <T> List<T> textExtractor(File in, Function<String, T> transformer) {
         try {
             PdfReader reader = new PdfReader(new FileInputStream(in));
             String firstPageText = pageTextExtractor(reader, new Rectangle(0, 92, 612, 455), 1);
@@ -39,7 +44,7 @@ public class FileTransactionsParser implements TransactionsParser<File> {
             allLines.addAll(restPagesText.toString().lines().collect(Collectors.toList()));
             List<String> blocks = transformLinesIntoBlock(allLines);
             reader.close();
-            return blocks.stream().map(this::lineToTransaction).collect(Collectors.toList());
+            return blocks.stream().map(transformer).collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -82,8 +87,8 @@ public class FileTransactionsParser implements TransactionsParser<File> {
     }
 
     private boolean isFirstWordDate(String line) {
-        String temp = line.split(" ")[0];
         try {
+        String temp = line.split(" ")[0];
             LocalDate.parse(temp, DateTimeFormatter.ofPattern("dd.MM.yyyy"));
             return true;
         } catch (Exception e) {

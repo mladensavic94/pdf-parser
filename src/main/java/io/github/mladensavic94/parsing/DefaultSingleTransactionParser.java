@@ -8,6 +8,7 @@ public class DefaultSingleTransactionParser implements SingleTransactionParser {
 
     @Override
     public Transaction parse(String s) throws ParseException {
+        System.out.println(s);
         Transaction transaction = new Transaction();
         String date1 = s.substring(0, 10);
         transaction.setDateOfTransaction(string2Date(date1));

@@ -9,5 +9,6 @@ import java.util.List;
  */
 public interface Exporter {
 
-    public void export(List<Transaction> transactionList);
+    void export(List<Transaction> transactionList);
+    void raw(List<String> transactionList);
 }

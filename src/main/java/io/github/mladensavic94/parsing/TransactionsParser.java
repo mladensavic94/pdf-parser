@@ -7,4 +7,5 @@ public interface TransactionsParser<I> {
 
 
     List<Transaction> parse(Supplier<I> input);
+    List<String> scrape(Supplier<I> input);
 }

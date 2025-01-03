@@ -34,4 +34,18 @@ public class CSVExporter implements Exporter {
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void raw(List<String> transactionList) {
+        try {
+            File file = new File(fileName);
+            PrintWriter out = new PrintWriter(file, StandardCharsets.UTF_8);
+            out.println(Transaction.csvHeaders());
+            transactionList.stream().filter(Objects::nonNull).forEach(out::println);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

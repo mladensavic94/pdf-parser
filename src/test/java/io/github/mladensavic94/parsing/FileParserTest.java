@@ -6,7 +6,12 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static io.github.mladensavic94.parsing.FileTransactionsParser.string2Double;
@@ -15,14 +20,23 @@ import static io.github.mladensavic94.parsing.FileTransactionsParser.string2Doub
 public class FileParserTest {
 
     @Test
-    public void testFile() throws FileNotFoundException {
+    public void testFile() {
         FileTransactionsParser parser = new FileTransactionsParser();
-        List<Transaction> parse = parser.parse(() -> new File("src/test/resources/11-20.PDF"));
-        parse.addAll(parser.parse(() -> new File("src/test/resources/12-20.PDF")));
-        parse.addAll(parser.parse(() -> new File("src/test/resources/01-21.PDF")));
-        parse.addAll(parser.parse(() -> new File("src/test/resources/02-21.PDF")));
-        CSVExporter csvExporter = new CSVExporter("1120-0221.csv");
-        csvExporter.export(parse);
+        String directoryPath = "E:\\workspace\\raif\\attachments";
+        List<String> parse = new ArrayList<>();
+
+        File directory = new File(directoryPath);
+        File[] files = directory.listFiles();
+
+        for (File file : files) {
+            try {
+                parse.addAll(parser.scrape(() -> file));
+            }catch (Exception ignored){
+            System.out.println(file.getName());
+            }
+        }
+        CSVExporter csvExporter = new CSVExporter("all.csv");
+        csvExporter.raw(parse);
     }
 
     @Test
